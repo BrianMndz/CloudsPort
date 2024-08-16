@@ -6,6 +6,9 @@
 #include "JuceHeader.h"
 #include "DSP/CloudsAudioBuffer.h"
 #include "Helpers/Parameters.h"
+#include "Granular/GranularPlayer.h"
+
+#define MAX_NUM_GRAINS 64
 
 enum PlaybackMode
 {
@@ -40,6 +43,7 @@ private:
 
     CloudsParameters* parameters_;
 
+    GranularPlayer grainPlayer_;
     // Add other necessary member variables and objects
     // (e.g., GranularSamplePlayer player_, WSOLASamplePlayer ws_player_, etc.)
 };

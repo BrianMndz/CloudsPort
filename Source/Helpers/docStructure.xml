@@ -1,0 +1,61 @@
+<documents>
+    <document index="1">
+        <source>CloudsPort</source>
+        <document_content>
+            <document index="1.2">
+                <source>Modules</source>
+                <document_content>
+                    <document index="1.2.1">
+                        <source>JUCE</source>
+                        <document_content>
+                            {{FOLDER_CONTENT}}
+                        </document_content>
+                    </document>
+                </document_content>
+            </document>
+            <document index="1.3">
+                <source>Source</source>
+                <document_content>
+                    <document index="1.3.1">
+                        <source>DSP</source>
+                        <document_content>
+                            CloudsAudioBuffer.h
+                            <document index="1.3.1.1">
+                                <source>Granular</source>
+                                <document_content>
+                                    Grain.cpp
+                                    Grain.h
+                                </document_content>
+                            </document>
+                            <document index="1.3.1.2">
+                                <source>Helpers</source>
+                                <document_content>
+                                    Parameters.h
+                                </document_content>
+                            </document>
+                            CMakeLists.txt
+                            GranularProcessor.cpp
+                            GranularProcessor.h
+                            PluginEditor.cpp
+                            PluginEditor.h
+                            PluginProcessor.cpp
+                            PluginProcessor.h
+                        </document_content>
+                    </document>
+                </document_content>
+            </document>
+            <document index="1.4">
+                <source>CMakeLists.txt</source>
+                <document_content>
+                    {{FILE_CONTENT}}
+                </document_content>
+            </document>
+            <document index="1.5">
+                <source>README.md</source>
+                <document_content>
+                    {{FILE_CONTENT}}
+                </document_content>
+            </document>
+        </document_content>
+    </document>
+</documents>

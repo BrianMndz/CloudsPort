@@ -20,6 +20,7 @@ void GranularProcessor::init(float sampleRate, int bufferSize)
     num_channels_ = 2;
 
     initDSPObjects();
+    grainPlayer_.init(num_channels_, MAX_NUM_GRAINS);
 }
 
 void GranularProcessor::process(const float* const* inputs, float* const* outputs, int num_frames)
@@ -58,6 +59,16 @@ void GranularProcessor::initDSPObjects()
 
 void GranularProcessor::processGranular(int num_frames)
 {
+    std::vector<float> temp_buffer(num_frames * 2);
+    grainPlayer_.process(buffer_, parameters_, temp_buffer.data(), num_frames);
+
+    for (int c = 0; c < num_channels_; ++c)
+    {
+        for (size_t i = 0; i < num_frames; ++i)
+        {
+            output_buffers_[c].setSample(0, i, temp_buffer[i * 2 + c]);
+        }
+    }
 }
 
 
