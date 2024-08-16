@@ -87,8 +87,16 @@ void CloudsAudioProcessor::changeProgramName (int index, const juce::String& new
 //==============================================================================
 void CloudsAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    /** Testing audio buffer class*/
+    inputBuffer.setSize(2, sampleRate * 10); // 10 seconds stereo buffer
+    outputBuffer.setSize(2, sampleRate * 10);
+
+    // Initialize wrapper, Testing audio buffer class*/
+    inputBufferLeft.init(inputBuffer, 0);
+    inputBufferRight.init(inputBuffer, 1);
+    outputBufferLeft.init(outputBuffer, 0);
+    outputBufferRight.init(outputBuffer, 1);
+
     juce::ignoreUnused (sampleRate, samplesPerBlock);
 }
 
@@ -131,27 +139,30 @@ void CloudsAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
     // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    /** TESTING buffers */
+    for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
     {
-        auto* channelData = buffer.getWritePointer (channel);
-        juce::ignoreUnused (channelData);
-        // ..do something to the data...
+        float leftSample = buffer.getSample(0, sample);
+        float rightSample = buffer.getNumChannels() > 1 ? buffer.getSample(1, sample) : leftSample;
+
+        // Write incoming audio to our input buffers
+        inputBufferLeft.write(leftSample);
+        inputBufferRight.write(rightSample);
+
+        // Here you would call your ported Clouds processing code
+        // using inputBufferLeft/Right for reading and outputBufferLeft/Right for writing
+
+        // Read from output buffers and write to JUCE buffer
+        buffer.setSample(0, sample, outputBufferLeft.read(0));
+        if (buffer.getNumChannels() > 1)
+            buffer.setSample(1, sample, outputBufferRight.read(0));
     }
+
+    /* Testing buffer */
 }
 
 void CloudsAudioProcessor::updateParameters()
