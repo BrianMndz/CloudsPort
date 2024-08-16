@@ -22,7 +22,7 @@ public:
     void init(float sampleRate, int bufferSize);
     void process(const float* const *inputs, float * const* outputs, int num_frames);
 
-    void setParameters(CloudParameters* params) { parameters_ = params; }
+    void setParameters(CloudsParameters* params) { parameters_ = params; }
     void setPlaybackMode(const PlaybackMode mode) { playback_mode_ = mode; }
 
 private:
@@ -38,7 +38,7 @@ private:
     juce::AudioBuffer<float> output_buffers_[2];
     CloudsAudioBuffer buffer_[2];
 
-    CloudParameters* parameters_;
+    CloudsParameters* parameters_;
 
     // Add other necessary member variables and objects
     // (e.g., GranularSamplePlayer player_, WSOLASamplePlayer ws_player_, etc.)

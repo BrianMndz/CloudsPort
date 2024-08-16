@@ -12,7 +12,7 @@ CloudsAudioProcessor::CloudsAudioProcessor()
                      #endif
                        )
 {
-    cloudsParams = std::make_unique<CloudParameters>(*this);
+    cloudsParams = std::make_unique<CloudsParameters>(*this);
 }
 
 CloudsAudioProcessor::~CloudsAudioProcessor()

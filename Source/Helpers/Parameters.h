@@ -5,10 +5,10 @@
 
 #include "JuceHeader.h"
 
-class CloudParameters
+class CloudsParameters
 {
 public:
-    explicit CloudParameters(juce::AudioProcessor &processor)
+    explicit CloudsParameters(juce::AudioProcessor &processor)
     {
         auto parametersLayout = createParamaterLayout();
         apvts = std::make_unique<juce::AudioProcessorValueTreeState>(processor, nullptr, "Parameters", std::move(parametersLayout));

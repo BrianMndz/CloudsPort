@@ -45,7 +45,7 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    std::unique_ptr<CloudParameters> cloudsParams;
+    std::unique_ptr<CloudsParameters> cloudsParams;
     void updateParameters();
 
     /** Testing audio buffer class*/
