@@ -38,7 +38,7 @@ juce_add_plugin(${PROJECT_NAME}
         PLUGIN_CODE Dem0                            # A unique four-character plugin id with exactly one upper-case character
         # GarageBand 10.3 requires the first letter to be upper-case, and the remaining letters to be lower-case
         FORMATS AU VST3 Standalone                  # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
-        PRODUCT_NAME "My Awesome Plugin")        # The name of the final executable, which can differ from the target name
+        PRODUCT_NAME "Nubes Port")        # The name of the final executable, which can differ from the target name
 
 # Add all source files
 set(SourceFiles)
