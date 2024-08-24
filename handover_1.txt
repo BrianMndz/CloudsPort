@@ -1,0 +1,124 @@
+Handover Document: Clouds Port to JUCE Plugin
+Project Overview
+We are porting the Clouds granular audio processor, originally designed for embedded hardware, to a JUCE-based audio plugin. The goal is to maintain core functionality while adapting to a desktop plugin environment.
+Current Status
+Completed Components
+
+CloudsParameters: Adapted for JUCE's AudioProcessorValueTreeState
+CloudsAudioBuffer: Bridge between JUCE's AudioBuffer and original buffer concept
+Grain: Basic implementation of individual grain processing unit
+GranularSamplePlayer: Initial implementation of the granular synthesis engine
+
+Partial Implementations
+
+GranularProcessor: Basic structure implemented, needs integration with GranularSamplePlayer
+PluginProcessor: Basic JUCE plugin structure set up, needs full integration with Clouds DSP
+
+Next Steps
+
+Refine GranularSamplePlayer
+
+Implement more sophisticated grain scheduling algorithms
+Add stereo spreading of grains
+Implement various grain envelope shapes
+Fine-tune parameter scaling and mapping
+
+
+Fully Integrate GranularSamplePlayer with GranularProcessor
+
+Update processGranular method to use GranularSamplePlayer
+Ensure proper buffer handling between JUCE audio thread and Clouds DSP
+
+
+Implement WSOLASamplePlayer
+
+Port the time-stretching algorithm from the original Clouds
+Integrate with GranularProcessor for stretch mode
+
+
+Develop LoopingSamplePlayer
+
+Implement looping delay functionality
+Integrate with GranularProcessor for looping delay mode
+
+
+Begin PhaseVocoder Implementation
+
+Start porting the spectral processing capabilities
+This will be needed for the spectral mode
+
+
+Expand Effect Modules
+
+Implement Reverb effect
+Port Diffuser functionality
+Add PitchShifter module
+
+
+Enhance Parameter Management
+
+Implement parameter smoothing for click-free changes
+Add MIDI CC mapping capabilities
+
+
+Start GUI Development
+
+Design main plugin interface
+Implement basic parameter controls (knobs, sliders, buttons)
+
+
+
+Important Considerations
+
+Memory Management
+
+The original Clouds used fixed memory allocation. We've transitioned to dynamic allocation where appropriate.
+Be mindful of real-time audio constraints when allocating memory.
+
+
+Audio Buffer Handling
+
+We're using JUCE's AudioBuffer wrapped in our custom CloudsAudioBuffer.
+The wrapper maintains a circular buffer behavior crucial for granular processing.
+
+
+Playback Modes
+
+Currently, only the basic structure for granular mode has been implemented.
+Other modes (spectral, pitch shift, looping delay) need to be developed and integrated.
+
+
+DSP Algorithms
+
+Some DSP algorithms may need optimization for real-time plugin performance.
+Consider SIMD optimizations where applicable.
+
+
+Sample Rate and Buffer Size Handling
+
+Ensure the plugin can handle various sample rates and buffer sizes common in DAW environments.
+
+
+
+Potential Challenges
+
+Maintaining low latency and CPU efficiency in a plugin environment.
+Accurately reproducing the unique sound character of the hardware version.
+Adapting hardware-specific optimizations to work efficiently on various desktop CPUs.
+
+Resources
+
+Original Embedded Clouds source code (provided in the project repository)
+JUCE documentation and forums for plugin-specific implementations
+Original Clouds manual for understanding the full feature set and user interactions
+
+Testing
+
+Implement unit tests for core DSP components as they are developed.
+Continuously compare audio output with the original hardware for quality assurance.
+Test with various buffer sizes and sample rates to ensure stability.
+
+Version Control
+The project is using Git for version control. Please commit regularly and provide clear, descriptive commit messages.
+
+This handover document provides a comprehensive overview of the current state of the project and outlines the next steps for continuing the Clouds port to a JUCE plugin. It should give the next engineer a clear understanding of what has been done and what needs to be tackled next.

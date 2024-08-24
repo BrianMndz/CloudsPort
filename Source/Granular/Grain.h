@@ -6,6 +6,12 @@
 #include "JuceHeader.h"
 #include "../DSP/CloudsAudioBuffer.h"
 
+enum class EnvelopeShape {
+    Rectangular,
+    Triangular,
+    Hann
+};
+
 class Grain {
 public:
     Grain() : active_(false), envelope_phase_(2.0f) {}
@@ -15,7 +21,9 @@ public:
                int32_t start,
                int32_t length,
                float pitch_ratio,
-               int32_t pre_delay);
+               int32_t pre_delay,
+               float pan,
+               EnvelopeShape envelopeShape);
     void process(const CloudsAudioBuffer *buffer, float* out, size_t size);
 
     bool active() const { return active_; }
@@ -30,6 +38,8 @@ private:
     int32_t length_;
     float pitch_ratio_;
     int32_t pre_delay_;
+    float pan_;
+    EnvelopeShape envelope_shape_;
 
     float phase_;
     float envelope_phase_;

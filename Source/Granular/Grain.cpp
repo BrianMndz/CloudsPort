@@ -10,13 +10,16 @@ void Grain::init()
     envelope_phase_ = 2.0f;
 }
 
-void Grain::start(int32_t buffer_size, int32_t start, int32_t length, float pitch_ratio, int32_t pre_delay)
+void Grain::start(int32_t buffer_size, int32_t start, int32_t length, float pitch_ratio, int32_t pre_delay,
+                  float pan, EnvelopeShape envelope_shape)
 {
     buffer_size_ = buffer_size;
     start_ = start;
     length_ = length;
     pitch_ratio_ = pitch_ratio;
     pre_delay_ = pre_delay;
+    pan_ = pan;
+    envelope_shape_ = envelope_shape;
 
     phase_ = 0.0f;
     envelope_phase_ = 0.0f;
@@ -41,7 +44,11 @@ void Grain::process(const CloudsAudioBuffer* buffer, float* out, size_t size)
         float sample = interpolateBuffer(buffer, phase_);
         float envelope = envelopeValue();
 
-        out[i * 2] = out[i * 2 + 1] = sample * envelope;
+        float left_gain = std::sqrt(0.5f - pan_ * 0.5f);
+        float right_gain = std::sqrt(0.5f + pan_ * 0.5f);
+
+        out[i * 2] += sample * envelope * left_gain;
+        out[i * 2 + 1] += sample * envelope * right_gain;
 
         phase_ += pitch_ratio_;
         if (phase_ >= static_cast<float>(length_))
@@ -72,10 +79,17 @@ float Grain::interpolateBuffer(const CloudsAudioBuffer* buffer, float phase) con
 
 float Grain::envelopeValue() const
 {
-    if (envelope_phase_ < 1.0f)
-        return envelope_phase_;
-    else
-        return 2.0f - envelope_phase_;
+    switch (envelope_shape_)
+    {
+        case EnvelopeShape::Rectangular:
+            return 1.0f;
+        case EnvelopeShape::Triangular:
+            return 1.0f - std::abs(envelope_phase_ * 2.0f - 1.0f);
+        case EnvelopeShape::Hann:
+            return 0.5f * (1.0f - std::cos(envelope_phase_ * float(M_PI) * 2.0f));
+        default:
+            return 0.0f;
+    }
 }
 
 

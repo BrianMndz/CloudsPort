@@ -18,7 +18,7 @@ void GranularPlayer::process(const CloudsAudioBuffer* buffer, CloudsParameters* 
 {
     float overlap = parameters->getAPVTS().getRawParameterValue("density")->load();
     overlap = overlap * overlap * overlap;
-    float target_num_grains = max_num_grains_ * overlap;
+    float target_num_grains = static_cast<float>(max_num_grains_) * overlap;
 
     std::fill(out, out + size * 2, 0.0f);
 
@@ -58,11 +58,32 @@ void GranularPlayer::scheduleGrain(CloudsParameters* parameters, int32_t buffer_
     float size = parameters->getAPVTS().getRawParameterValue("size")->load();
     float pitch = parameters->getAPVTS().getRawParameterValue("pitch")->load();
 
-    int32_t grain_size = static_cast<int32_t>(size * 100000.f);
-    int32_t start = static_cast<int32_t>(position * buffer_size);
+    auto grain_size = static_cast<int32_t>(size * 100000.f);
+    auto start = static_cast<int32_t>(position * buffer_size);
     float pitch_ratio = std::pow(2.0f, pitch / 12.0f);
+    float pan = calculateGrainPan();
 
-    it->start(buffer_size, start, grain_size, pitch_ratio, 0);
+    it->start(buffer_size, start, grain_size, pitch_ratio, 0, pan, envelope_shape_); // **
 
     num_grains_ = std::min(num_grains_ + 1.0f, static_cast<float>(max_num_grains_));
+}
+
+float GranularPlayer::calculateGrainPan()
+{
+    return static_cast<float>(std::uniform_real_distribution<>(-stereo_spread_, stereo_spread_)(rng_));
+}
+
+float GranularPlayer::getEnvelopeValue(float phase)
+{
+    switch (envelope_shape_)
+    {
+        case EnvelopeShape::Rectangular:
+            return 1.0f;
+        case EnvelopeShape::Triangular:
+            return 1.0f - std::abs(phase - 1.0f);
+        case EnvelopeShape::Hann:
+            return 0.5f * (1.0f - std::cos(phase * float(M_PI)));
+        default:
+            return 0.0f;
+    }
 }
