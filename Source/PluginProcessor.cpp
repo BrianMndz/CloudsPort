@@ -13,6 +13,7 @@ CloudsAudioProcessor::CloudsAudioProcessor()
                        )
 {
     cloudsParams = std::make_unique<CloudsParameters>(*this);
+    granularProcessor = std::make_unique<GranularProcessor>();
 }
 
 CloudsAudioProcessor::~CloudsAudioProcessor()
@@ -87,17 +88,8 @@ void CloudsAudioProcessor::changeProgramName (int index, const juce::String& new
 //==============================================================================
 void CloudsAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    /** Testing audio buffer class*/
-    inputBuffer.setSize(2, sampleRate * 10); // 10 seconds stereo buffer
-    outputBuffer.setSize(2, sampleRate * 10);
-
-    // Initialize wrapper, Testing audio buffer class*/
-    inputBufferLeft.init(inputBuffer, 0);
-    inputBufferRight.init(inputBuffer, 1);
-    outputBufferLeft.init(outputBuffer, 0);
-    outputBufferRight.init(outputBuffer, 1);
-
-    juce::ignoreUnused (sampleRate, samplesPerBlock);
+    granularProcessor->init(static_cast<float>(sampleRate), samplesPerBlock);
+    granularProcessor->setParameters(cloudsParams.get());
 }
 
 void CloudsAudioProcessor::releaseResources()
@@ -143,30 +135,21 @@ void CloudsAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    /** TESTING buffers */
-    for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
-    {
-        float leftSample = buffer.getSample(0, sample);
-        float rightSample = buffer.getNumChannels() > 1 ? buffer.getSample(1, sample) : leftSample;
+    // Get pointers to input and output channel data
+    auto inputChannelData = buffer.getArrayOfReadPointers();
+    auto outputChannelData = buffer.getArrayOfWritePointers();
 
-        // Write incoming audio to our input buffers
-        inputBufferLeft.write(leftSample);
-        inputBufferRight.write(rightSample);
+    granularProcessor->process(inputChannelData, outputChannelData, buffer.getNumSamples());
 
-        // Here you would call your ported Clouds processing code
-        // using inputBufferLeft/Right for reading and outputBufferLeft/Right for writing
-
-        // Read from output buffers and write to JUCE buffer
-        buffer.setSample(0, sample, outputBufferLeft.read(0));
-        if (buffer.getNumChannels() > 1)
-            buffer.setSample(1, sample, outputBufferRight.read(0));
-    }
-
-    /* Testing buffer */
+    // Update parameters
+    updateParameters();
 }
 
 void CloudsAudioProcessor::updateParameters()
 {
+    granularProcessor->setParameters(cloudsParams.get());
+    float master_volume = cloudsParams->getAPVTS().getRawParameterValue("master_volume")->load();
+    granularProcessor->setMasterGain(master_volume);
 }
 
 //==============================================================================
@@ -177,7 +160,8 @@ bool CloudsAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* CloudsAudioProcessor::createEditor()
 {
-    return new CloudsAudioProcessorEditor (*this);
+    return new juce::GenericAudioProcessorEditor(*this);
+    //return new CloudsAudioProcessorEditor (*this);
 }
 
 //==============================================================================

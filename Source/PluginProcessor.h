@@ -2,6 +2,7 @@
 
 #include "Helpers/Parameters.h"
 #include "DSP/CloudsAudioBuffer.h"
+#include "GranularProcessor.h"
 
 #include <JuceHeader.h>
 
@@ -46,18 +47,11 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     std::unique_ptr<CloudsParameters> cloudsParams;
-    void updateParameters();
-
-    /** Testing audio buffer class*/
-    CloudsAudioBuffer inputBufferLeft;
-    CloudsAudioBuffer inputBufferRight;
-    CloudsAudioBuffer outputBufferLeft;
-    CloudsAudioBuffer outputBufferRight;
 
 private:
-    /** Testing audio buffer class*/
-    juce::AudioBuffer<float> inputBuffer;
-    juce::AudioBuffer<float> outputBuffer;
+    std::unique_ptr<GranularProcessor> granularProcessor;
+
+    void updateParameters();
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CloudsAudioProcessor)

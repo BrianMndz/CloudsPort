@@ -27,15 +27,18 @@ public:
 
     void setParameters(CloudsParameters* params) { parameters_ = params; }
     void setPlaybackMode(const PlaybackMode mode) { playback_mode_ = mode; }
+    void setMasterGain(float gain) { master_gain_ = gain; }
 
 private:
     void initDSPObjects();
     void processGranular(int num_frames);
+    void updateGranularParameters();
 
     float sample_rate_{};
     int buffer_size_{};
     int num_channels_{};
     PlaybackMode playback_mode_;
+    float master_gain_ = 0.5f;
 
     juce::AudioBuffer<float> input_buffers_[2];
     juce::AudioBuffer<float> output_buffers_[2];

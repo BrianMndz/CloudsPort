@@ -23,6 +23,7 @@ private:
     {
         juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
+        layout.add(std::make_unique<juce::AudioParameterFloat>("master_volume", "Master Volume", 0.0f, 1.0f, 0.5f));
         layout.add(std::make_unique<juce::AudioParameterFloat>("position", "Position", 0.0f, 1.0f, 0.5f));
         layout.add(std::make_unique<juce::AudioParameterFloat>("size", "Size", 0.0f, 1.0f, 0.5f));
         layout.add(std::make_unique<juce::AudioParameterFloat>("pitch", "Pitch", -24.0f, 24.0f, 0.0f));

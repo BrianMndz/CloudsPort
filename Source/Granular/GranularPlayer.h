@@ -23,6 +23,10 @@ public:
     void setStereoSpread(float spread) { stereo_spread_ = spread; }
     void setEnvelopeShape(EnvelopeShape shape) { envelope_shape_ = shape; }
 
+    void setPosition(float position);   //Not implemented yet
+    void setSize(float size);           //Not implemented yet
+    void setPitch(float pitch);         //Not implemented yet
+
 private:
     void scheduleGrain(CloudsParameters* parameters,
                 int32_t buffer_size,

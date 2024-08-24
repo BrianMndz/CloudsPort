@@ -1,4 +1,4 @@
-# Audio-Plugin-Template
+# Clouds
 
 This is a template repository for a JUCE project using CMake and Xcode.
 _Based on the Pamplejuce by Sudara but for beginners._
