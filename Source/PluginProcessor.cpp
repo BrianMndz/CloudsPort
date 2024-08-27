@@ -150,6 +150,9 @@ void CloudsAudioProcessor::updateParameters()
     granularProcessor->setParameters(cloudsParams.get());
     float master_volume = cloudsParams->getAPVTS().getRawParameterValue("master_volume")->load();
     granularProcessor->setMasterGain(master_volume);
+
+    bool freeze = static_cast<bool>(cloudsParams->getAPVTS().getRawParameterValue("freeze")->load());
+    granularProcessor->setFreeze(freeze);
 }
 
 //==============================================================================

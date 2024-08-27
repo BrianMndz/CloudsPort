@@ -9,11 +9,13 @@ void GranularProcessor::init(float sampleRate, int bufferSize)
     sample_rate_ = sampleRate;
     buffer_size_ = bufferSize;
 
+    float freezeTimeSecs = 5.0f;
     for (size_t i = 0; i < 2; ++i)
     {
         input_buffers_[i].setSize(1, bufferSize);
         output_buffers_[i].setSize(1, bufferSize);
-        buffer_[i].init(input_buffers_[i], 0);
+        freeze_buffers_[i].setSize(1, static_cast<int>(sampleRate * freezeTimeSecs));
+        buffer_[i].init(input_buffers_[i], freeze_buffers_[i], 0, sampleRate, freezeTimeSecs);
     }
 
     playback_mode_ = PLAYBACK_MODE_GRANULAR;
@@ -24,14 +26,18 @@ void GranularProcessor::init(float sampleRate, int bufferSize)
 
 void GranularProcessor::process(const float* const* inputs, float* const* outputs, int num_frames)
 {
+    updateGranularParameters();
+
     //Write input buffer
-    for (size_t c = 0; c < num_channels_; ++c)
-    {
-        for (size_t i = 0; i < num_frames; ++i)
-        {
+    for (size_t c = 0; c < num_channels_; ++c) {
+        for (size_t i = 0; i < num_frames; ++i) {
             buffer_[c].write(inputs[c][i]);
         }
     }
+
+    for (size_t c = 0; c < num_channels_; ++c)
+        output_buffers_[c].clear();
+
 
     switch (playback_mode_)
     {
@@ -44,24 +50,9 @@ void GranularProcessor::process(const float* const* inputs, float* const* output
 
     // Copy processed audio to output
     for (int c = 0; c < num_channels_; ++c)
-    {
         for (int i = 0; i < num_frames; ++i)
-        {
-            outputs[c][i] = output_buffers_[c].getSample(0, i);
-        }
-    }
+            outputs[c][i] = output_buffers_[c].getSample(0, i) * master_gain_;
 
-    for (int c = 0; c < num_channels_; ++c)
-    {
-        for (int i = 0; i < num_frames; ++i)
-        {
-            outputs[c][i] *= master_gain_;
-        }
-    }
-
-    // Debug output
-    //juce::Logger::writeToLog("GranularProcessor processed " + juce::String(num_frames) + " frames");
-    //juce::Logger::writeToLog("First sample value: " + juce::String(outputs[0][0]));
 }
 
 void GranularProcessor::initDSPObjects()
@@ -113,6 +104,15 @@ void GranularProcessor::updateGranularParameters()
         auto& apvts = parameters_->getAPVTS();
         grainPlayer_.setDensity(apvts.getRawParameterValue("density")->load());
         grainPlayer_.setStereoSpread(apvts.getRawParameterValue("stereo_spread")->load());
+    }
+}
+
+void GranularProcessor::setFreeze(bool freeze)
+{
+    is_frozen_ = freeze;
+    for (size_t i = 0; i < num_channels_; ++i)
+    {
+        buffer_[i].setFrozen(freeze);
     }
 }
 
